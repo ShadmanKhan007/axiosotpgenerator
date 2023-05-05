@@ -1,25 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
 
-function App() {
+import './App.css';
+import axios from 'axios';
+import {React, useState} from 'react';
+
+  function App(){
+
+  const [mobile, setMobile] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+function GetOtp (){
+
+    if(!NumValidation(mobile)) {
+      setErrorMessage("Enter a 10-digit number...")
+      return;
+    }
+
+  const body = JSON.stringify({mobile});
+  axios
+    .post("https://cdn-api.co-vin.in/api/v2/auth/public/generateOTP",
+     body, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(response => {
+          console.log(response)
+          if (response.status==200) {
+            setMobile('');
+            setErrorMessage("OTP Sended")
+          }
+        })
+        .catch(error => {
+          setErrorMessage("Some Error");
+        });
+    }
+  
+  const NumValidation = (mobile) => {
+    if(mobile.length==10){
+      return true
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <h1> Generate Otp </h1>
+      <input type="number" value={mobile} onChange={e => setMobile(e.target.value)} placeholder="Enter your mobile number" />
+      <button onClick={GetOtp}>GET OTP</button>
+      <p className="error">{errorMessage}</p>
     </div>
   );
-}
+};
 
 export default App;
